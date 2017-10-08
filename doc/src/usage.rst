@@ -13,9 +13,13 @@ Consider the following example test module:
 All the tests are decorated with :func:`pytest.mark.dependency`.  This
 will cause the test results to be registered internally and thus other
 tests may depend on them.  The list of dependencies of a test may be
-set in the optional `depends` argument to the marker.  The first test
-has deliberately been set to fail to illustrate the effect.  We will
-get the following resuts:
+set in the optional `depends` argument to the marker.  Running this
+test, we will get the following result:
+
+.. literalinclude:: ../examples/basic.out
+
+The first test has deliberately been set to fail to illustrate the
+effect.  We will get the following resuts:
 
 `test_a`
   deliberatly fails.
@@ -47,6 +51,23 @@ set:
 
 .. literalinclude:: ../examples/named.py
 
+.. _usage-parametrized:
+
+Using test classes
+------------------
+
+Tests may be grouped in classes in pytest.  Marking the dependencies
+of methods in test classes works the same way as for simple test
+functions.  In the following example we define two test classes.  Each
+works in the same manner as the previous examples respectively:
+
+.. literalinclude:: ../examples/testclass.py
+
+In `TestClass` the default names for the tests are used, which is
+build from the name of the class and the respective method in this
+case, while in `TestClassNamed` these names are overridden by an
+explicit name argument to the :func:`pytest.mark.dependency` marker.
+
 Parametrized tests
 ------------------
 
@@ -75,7 +96,7 @@ following example:
 .. literalinclude:: ../examples/runtime.py
 
 Tests `test_c` and `test_d` set their dependencies at runtime calling
-:func:`pytest_dependency.depends`.  The first argument is the values
+:func:`pytest_dependency.depends`.  The first argument is the value
 of the `request` pytest fixture, the second argument is the list of
 dependencies.  It has the same effect as passing this list as the
 `depends` argument to the :func:`pytest.mark.dependency` marker.

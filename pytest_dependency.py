@@ -52,14 +52,17 @@ class DependencyManager(object):
     def addResult(self, item, marker, rep):
         name = marker.kwargs.get('name')
         if not name:
-            name = item.name
+            if item.cls:
+                name = "%s::%s" % (item.cls.__name__, item.name)
+            else:
+                name = item.name
         status = self.results.setdefault(name, DependencyItemStatus())
         status.addResult(rep)
 
-    def checkDepend(self, depends):
+    def checkDepend(self, depends, item):
         for i in depends:
             if not(i in self.results and self.results[i].isSuccess()):
-                pytest.skip("depends on %s" % i)
+                pytest.skip("%s depends on %s" % (item.name, i))
 
 
 def depends(request, other):
@@ -76,10 +79,12 @@ def depends(request, other):
     :param other: dependencies, a list of names of tests that this
         test depends on.
     :type other: iterable of :class:`str`
+
+    .. versionadded:: 0.2
     """
     item = request.node
     manager = DependencyManager.getManager(item)
-    manager.checkDepend(other)
+    manager.checkDepend(other, item)
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -103,4 +108,4 @@ def pytest_runtest_setup(item):
         depends = marker.kwargs.get('depends')
         if depends:
             manager = DependencyManager.getManager(item)
-            manager.checkDepend(depends)
+            manager.checkDepend(depends, item)
