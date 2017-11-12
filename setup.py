@@ -1,13 +1,54 @@
 #! /usr/bin/python
+"""pytest-dependency - Manage dependencies of tests
+
+This pytest plugin manages dependencies of tests.  It allows to mark
+some tests as dependent from other tests.  These tests will then be
+skipped if any of the dependencies did fail or has been skipped.
+"""
+
+__version__ = "0.2"
 
 import sys
+import os
+import os.path
+import re
 from setuptools import setup
-import pytest_dependency
+import setuptools.command.sdist as st_sdist
+
+
+def _filter_file(src, dest, subst):
+    """Copy src to dest doing substitutions on the fly.
+    """
+    substre = re.compile(r'\$(%s)' % '|'.join(subst.keys()))
+    def repl(m):
+        return subst[m.group(1)]
+    with open(src, "rt") as sf:
+        with open(dest, "wt") as df:
+            while True:
+                l = sf.readline()
+                if not l:
+                    break
+                df.write(re.sub(substre, repl, l))
+
+class sdist(st_sdist.sdist):
+    def make_release_tree(self, base_dir, files):
+        st_sdist.sdist.make_release_tree(self, base_dir, files)
+        if not self.dry_run:
+            src = "pytest_dependency.py"
+            dest = os.path.join(base_dir, src)
+            gitrevfile = ".gitrevision"
+            if hasattr(os, 'link') and os.path.exists(dest):
+                os.unlink(dest)
+            subst = {'DOC': __doc__, 'VERSION': __version__}
+            if os.path.exists(gitrevfile):
+                with open(gitrevfile, "rt") as f:
+                    subst['REVISION'] = f.readline().strip()
+            _filter_file(src, dest, subst)
 
 
 setup(
     name='pytest-dependency',
-    version=pytest_dependency.__version__,
+    version=__version__,
     description='Manage dependencies of tests',
     author='Rolf Krahl',
     author_email='rolf@rotkraut.de',
@@ -15,7 +56,7 @@ setup(
     maintainer_email='rolf@rotkraut.de',
     url='https://github.com/RKrahl/pytest-dependency',
     license='Apache Software License 2.0',
-    long_description=pytest_dependency.__doc__,
+    long_description=__doc__,
     py_modules=['pytest_dependency'],
     install_requires=['pytest >= 2.8.0'],
     classifiers=[
@@ -42,4 +83,5 @@ setup(
             'dependency = pytest_dependency',
         ],
     },
+    cmdclass = {'sdist': sdist},
 )
