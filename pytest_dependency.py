@@ -1,7 +1,7 @@
 """$DOC"""
 
 __version__ = "$VERSION"
-__revision__ = "$REVISION (python2_6 patch)"
+__revision__ = "$REVISION"
 
 import pytest
 
