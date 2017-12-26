@@ -4,10 +4,26 @@ Installation instructions
 System requirements
 -------------------
 
-+ Python 2.6, 2.7, or 3.1 and newer.
++ Python 2.6, 2.7, or 3.2 and newer.
   Python 2.6 requires patching the sources, see below.
 + `setuptools`_.
 + `pytest`_ 2.8.0 or newer.
+
+(Python 3.1 is not supported by pytest 2.8.0 itself.)
+
+
+.. _install-other-packages:
+
+Interaction with other packages
+-------------------------------
+
+pytest-xdist
+   pytest-xdist features test run parallelization, e.g. distributing
+   tests over separate processes that run in parallel.  This is based
+   on the assumption that the tests can be run independent of each
+   other.  Obviously, if you are using pytest-dependency, this
+   assumption is not valid.  Thus, pytest-dependency will only work if
+   you do not enable parallelization in pytest-xdist.
 
 
 Download
