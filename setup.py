@@ -6,7 +6,7 @@ some tests as dependent from other tests.  These tests will then be
 skipped if any of the dependencies did fail or has been skipped.
 """
 
-__version__ = "0.3"
+__version__ = "0.3.1"
 
 import sys
 import os
