@@ -6,9 +6,8 @@ some tests as dependent from other tests.  These tests will then be
 skipped if any of the dependencies did fail or has been skipped.
 """
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
-import sys
 import os
 import os.path
 import re
@@ -57,10 +56,14 @@ setup(
     url='https://github.com/RKrahl/pytest-dependency',
     license='Apache Software License 2.0',
     long_description=__doc__,
+    project_urls={
+        'Documentation': 'https://pytest-dependency.readthedocs.io/',
+        'Source Code': 'https://github.com/RKrahl/pytest-dependency',
+    },
     py_modules=['pytest_dependency'],
     install_requires=['pytest >= 2.8.0'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Framework :: Pytest',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
