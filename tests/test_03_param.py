@@ -53,3 +53,44 @@ def test_multiple(ctestdir):
         *::test_c?2? SKIPPED
         *::test_c?3? PASSED
     """)
+
+def test_auto_param_expand(ctestdir):
+    ctestdir.makepyfile("""
+        import pytest
+
+        @pytest.mark.parametrize("x", [0,1])
+        @pytest.mark.dependency()
+        def test_a(x):
+            pass
+
+        @pytest.mark.parametrize("x", [0,1])
+        @pytest.mark.dependency()
+        def test_b(x):
+            assert x == 0
+
+        @pytest.mark.dependency(depends=["test_a*"])
+        def test_c():
+            pass
+
+        @pytest.mark.dependency(depends=["test_b*"])
+        def test_d():
+            pass
+
+        @pytest.mark.dependency(depends=["test_null*"])
+        def test_e():
+            pass
+
+    """)
+
+    result = ctestdir.runpytest("--verbose")
+    result.assert_outcomes(passed=4, skipped=2, failed=1)
+    print(result.stdout)
+    result.stdout.fnmatch_lines("""
+        *::test_a?0? PASSED
+        *::test_a?1? PASSED
+        *::test_b?0? PASSED
+        *::test_b?1? FAILED
+        *::test_c PASSED
+        *::test_d SKIPPED
+        *::test_e SKIPPED
+    """)

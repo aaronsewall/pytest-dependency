@@ -75,6 +75,16 @@ class DependencyManager(object):
                 if i in self.results:
                     if self.results[i].isSuccess():
                         continue
+                elif "*" in i:
+                    # Replace "*" with "[" then search the results for any
+                    # matches in the results, this should catch parameterized
+                    # tests
+                    dep = i.replace("*", "[")
+                    dep_list = [x for x in self.results if dep in x]
+                    if dep_list:
+                        # Check the depends list to ensure they all passed
+                        if all(self.results[x].isSuccess() for x in dep_list):
+                            continue
                 else:
                     if _ignore_unknown:
                         continue
